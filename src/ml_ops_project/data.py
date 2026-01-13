@@ -56,10 +56,7 @@ class MyDataset(Dataset):
             ds = load_from_disk(str(raw_path))
 
         # Handle DatasetDict vs Dataset
-        if hasattr(ds, "keys") and "train" in ds:
-            train_ds = ds["train"]
-        else:
-            train_ds = ds
+        train_ds = ds["train"] if hasattr(ds, "keys") and "train" in ds else ds
 
         print("Preprocessing data...")
 
@@ -155,7 +152,7 @@ class TransactionDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-    def setup(self, stage: str = None):
+    def setup(self):
         print(f"Loading data from {self.data_path}...")
         full_dataset = MyDataset(self.data_path)
         full_dataset.load()
