@@ -4,20 +4,29 @@ from invoke import Context, task
 
 WINDOWS = os.name == "nt"
 PROJECT_NAME = "ml_ops_project"
-PYTHON_VERSION = "3.12"
+PYTHON_VERSION = "3.11"
 
 
 # Project commands
 @task
 def preprocess_data(ctx: Context) -> None:
     """Preprocess data."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/data.py data/raw data/processed", echo=True, pty=not WINDOWS)
+    ctx.run(f"uv run src/{PROJECT_NAME}/data.py", echo=True, pty=not WINDOWS)
 
+@task
+def preprocess_data_transformer(ctx: Context) -> None:
+    """Preprocess data."""
+    ctx.run(f"uv run src/{PROJECT_NAME}/data_transformer.py", echo=True, pty=not WINDOWS)
 
 @task
 def train(ctx: Context) -> None:
     """Train model."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
+    ctx.run(f"uv run src/{PROJECT_NAME}/train.py fit", echo=True, pty=not WINDOWS)
+
+@task
+def train_transformer(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"uv run src/{PROJECT_NAME}/train_transformer.py fit", echo=True, pty=not WINDOWS)
 
 
 @task
