@@ -1,0 +1,40 @@
+# lightning.pytorch==2.x
+
+model:
+  input_dim: 32
+  hidden_dim: 64
+  output_dim: 10
+  learning_rate: 0.001
+data:
+  data_path: "data/processed/transactiq_processed"
+  batch_size: 64
+  num_workers: 4
+trainer:
+  max_epochs: 100
+  min_epochs: 1
+  accelerator: "auto"
+  devices: "auto"
+  # deterministic: true # Ensure reproducibility if needed
+  
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: "ml_ops_project"
+      name: "transaction_model_run"
+      log_model: false
+
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: "val_loss"
+        patience: 5
+        mode: "min"
+        verbose: true
+    
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "models/checkpoints"
+        filename: "transaction-model-{epoch:02d}-{val_loss:.2f}"
+        save_top_k: 1
+        monitor: "val_loss"
+        mode: "min"

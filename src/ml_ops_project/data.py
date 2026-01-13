@@ -1,11 +1,12 @@
 from pathlib import Path
 
+import lightning as pl
 import numpy as np
 import torch
 import typer
 from datasets import load_dataset, load_from_disk
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset, random_split
 
 DATASET_ID = "sreesharvesh/transactiq-enriched"
 SAVED_NAME = "transactiq_enriched_hf"
@@ -143,3 +144,49 @@ def preprocess(output_folder: Path = Path("data"), subset: bool = False) -> None
 
 if __name__ == "__main__":
     typer.run(preprocess)
+
+
+class TransactionDataModule(pl.LightningDataModule):
+    def __init__(
+        self, data_path: str = "data/processed/transactiq_processed", batch_size: int = 64, num_workers: int = 4
+    ):
+        super().__init__()
+        self.data_path = Path(data_path)
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
+    def setup(self, stage: str = None):
+        print(f"Loading data from {self.data_path}...")
+        full_dataset = MyDataset(self.data_path)
+        full_dataset.load()
+
+        # Split 80/10/10 Simple
+        total_size = len(full_dataset)
+        train_size = int(0.8 * total_size)
+        val_size = int(0.1 * total_size)
+        test_size = total_size - train_size - val_size
+
+        print(f"Splitting dataset: Train={train_size}, Val={val_size}, Test={test_size}")
+
+        self.train_dataset, self.val_dataset, self.test_dataset = random_split(
+            full_dataset, [train_size, val_size, test_size], generator=torch.Generator().manual_seed(42)
+        )
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+            persistent_workers=True,
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset, batch_size=self.batch_size, num_workers=self.num_workers, persistent_workers=True
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset, batch_size=self.batch_size, num_workers=self.num_workers, persistent_workers=True
+        )

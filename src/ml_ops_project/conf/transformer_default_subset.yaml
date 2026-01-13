@@ -1,0 +1,43 @@
+# lightning.pytorch==2.x
+
+model:
+  model_name_or_path: "distilbert-base-uncased"
+  num_labels: 10
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  freeze_backbone: true
+
+data:
+  data_path: "data"
+  batch_size: 32
+  max_length: 64
+  num_workers: 4
+  limit_samples: 5000
+
+trainer:
+  max_epochs: 5
+  accelerator: "auto"
+  devices: "auto"
+  
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      project: "ml_ops_project"
+      name: "transformer_model_subset_run"
+      log_model: false
+
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: "val_loss"
+        patience: 2
+        mode: "min"
+        verbose: true
+    
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "models/checkpoints_transformer_subset"
+        filename: "transformer-subset-{epoch:02d}-{val_loss:.2f}-{val_acc:.2f}"
+        save_top_k: 1
+        monitor: "val_loss"
+        mode: "min"
