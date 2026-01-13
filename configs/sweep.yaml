@@ -1,0 +1,28 @@
+program: src/ml_ops_project/train.py
+name: sweep_test
+project: ml_ops_project 
+method: bayes
+metric:
+    goal: minimize
+    name: val_loss
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - "fit"
+  - "--config"
+  - "src/ml_ops_project/conf/default.yaml"
+  - ${args}
+parameters:
+    data.batch_size:
+      distribution: q_log_uniform_values
+      q: 8
+      min: 32
+      max: 256
+    model.learning_rate:
+      distribution: log_uniform_values
+      min: 1e-4
+      max: 1e-2
+    model.hidden_dim:
+      values: [32, 64, 128]
+run-cap: 10
