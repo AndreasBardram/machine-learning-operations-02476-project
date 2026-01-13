@@ -1,6 +1,6 @@
 import lightning as pl
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as f
 from torch import nn
 
 
@@ -41,7 +41,7 @@ class TransactionModel(pl.LightningModule):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch):
         x, y = batch["features"], batch["labels"]
         logits = self(x)
         loss = self.criterion(logits, y)
@@ -53,7 +53,7 @@ class TransactionModel(pl.LightningModule):
         self.log("train_acc", acc, prog_bar=True)
         return loss
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch):
         x, y = batch["features"], batch["labels"]
         logits = self(x)
         loss = self.criterion(logits, y)
@@ -64,7 +64,7 @@ class TransactionModel(pl.LightningModule):
         self.log("val_acc", acc, prog_bar=True)
         return loss
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch):
         x, y = batch["features"], batch["labels"]
         logits = self(x)
         loss = self.criterion(logits, y)
@@ -91,4 +91,4 @@ if __name__ == "__main__":
 
     logits = model(x)
     print(f"Output shape: {logits.shape}")
-    print(f"Probabilities: {F.softmax(logits, dim=1)}")
+    print(f"Probabilities: {f.softmax(logits, dim=1)}")

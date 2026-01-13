@@ -80,7 +80,7 @@ class TextDataModule(pl.LightningDataModule):
 
             # Need to encode labels as integers
             # We must derive this from the full dataset (or a known list) to ensure consistency across subsets
-            # But for now, using the current (possibly subsetted) ds unique values might be risky if subset 
+            # But for now, using the current (possibly subsetted) ds unique values might be risky if subset
             # misses a class.
             # Ideally we should use the full dataset to get unique categories, or hardcode them if known.
             # Since we loaded the full raw ds above (ds), let's use that for label mapping
