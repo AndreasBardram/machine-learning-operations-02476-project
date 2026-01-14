@@ -7,11 +7,11 @@ PROJECT_NAME = "ml_ops_project"
 PYTHON_VERSION = "3.11"
 
 
-# Project commands
 @task
-def preprocess_data(ctx: Context) -> None:
+def preprocess_data(ctx: Context, subset: bool = False) -> None:
     """Preprocess data."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/data.py", echo=True, pty=not WINDOWS)
+    subset_flag = "--subset" if subset else "--no-subset"
+    ctx.run(f"uv run src/{PROJECT_NAME}/data.py {subset_flag}", echo=True, pty=not WINDOWS)
 
 
 @task
@@ -21,9 +21,14 @@ def preprocess_data_transformer(ctx: Context) -> None:
 
 
 @task
-def train(ctx: Context) -> None:
+def train(ctx: Context, epochs: int = 10, subset: bool = False) -> None:
     """Train model."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/train.py fit", echo=True, pty=not WINDOWS)
+    data_path = "data/processed/transactiq_processed_subset" if subset else "data/processed/transactiq_processed"
+    ctx.run(
+        f"uv run src/{PROJECT_NAME}/train.py fit --trainer.max_epochs {epochs} --data.data_path {data_path}", 
+        echo=True, 
+        pty=not WINDOWS
+    )
 
 
 @task

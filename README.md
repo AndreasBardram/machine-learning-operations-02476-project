@@ -4,10 +4,12 @@ DTU course: 02476, machine learning operations
 ## Commands to run project:
 ### Running data processing modules:
 - invoke preprocess-data
+- invoke preprocess-data --subset  (if you want 10% subset instead)
 - invoke preprocess-data-transformer
 
 ### Running training modules: (requires data modules to be run first)
 - invoke train
+- invoke train --epochs 10 --subset (if you want to train for 10 epoch and on subset data)
 - invoke train-transformer
 
 ## Code Coverage:
