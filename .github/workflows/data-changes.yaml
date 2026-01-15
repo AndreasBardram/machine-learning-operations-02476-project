@@ -1,17 +1,30 @@
-name: Code linting
+name: Data Changes
 
 on:
   push:
     branches:
       - main
+    paths:
+      - "data/**"
+      - "configs/**"
+      - "config.yaml"
+      - ".dvc/**"
+      - "dvc.lock"
+      - "dvc.yaml"
   pull_request:
     branches:
       - main
+    paths:
+      - "data/**"
+      - "configs/**"
+      - "config.yaml"
+      - ".dvc/**"
+      - "dvc.lock"
+      - "dvc.yaml"
   workflow_dispatch: {}
 
 jobs:
-  format:
-    name: Check code formatting
+  data-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,18 +35,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip setuptools wheel
           pip install uv
-          uv pip install --system ruff
-          uv pip list --system
+          uv sync --dev --locked
 
-      - name: ruff check
+      - name: Run data-related tests
         run: |
-          ruff check .
-
-      - name: ruff format
-        run: |
-          ruff format . --check
+          uv run pytest -v tests/test_data.py tests/test_data_transformer.py
