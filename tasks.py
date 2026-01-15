@@ -68,3 +68,17 @@ def build_docs(ctx: Context) -> None:
 def serve_docs(ctx: Context) -> None:
     """Serve documentation."""
     ctx.run("uv run mkdocs serve --config-file docs/mkdocs.yaml", echo=True, pty=not WINDOWS)
+
+
+# ruff commands
+@task
+def lint(ctx: Context, fix: bool = False):
+    """Run ruff linter"""
+    fix_flag = "--fix" if fix else ""
+    ctx.run(f"uv run ruff check . {fix_flag}", echo=True, pty=not WINDOWS)
+
+def format(ctx: Context, check: bool = False):
+    """Run ruff formatting"""
+    check_flag = "--check" if check else ""
+    ctx.run(f"uv run ruff format . {check_flag}", echo=True, pty=not WINDOWS)
+
