@@ -10,11 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.12", "3.11"]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -23,14 +19,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip setuptools wheel
-          pip install -r requirements.txt
-          pip list
+          pip install uv
+          uv pip install --system -e .
+          uv pip install --system pytest coverage pytest-cov
+          uv pip list --system
 
 
       - name: Run tests & coverage

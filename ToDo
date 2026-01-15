@@ -24,7 +24,7 @@ Otto [x] Use PyTorch-lightning (if applicable) to reduce the amount of boilerpla
 Frederik [x] Write unit tests related to the data part of your code (M16)
 Frederik [x] Write unit tests related to model construction and or model training (M16)
 Frederik [x] Calculate the code coverage (M16)
-Andreas [ ] Get some continuous integration running on the GitHub repository (M17)
+Andreas [x] Get some continuous integration running on the GitHub repository (M17)
 Andreas [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
 Andreas [ ] Add a linting step to your continuous integration (M17)
 Andreas [ ] Add pre-commit hooks to your version control setup (M18)
