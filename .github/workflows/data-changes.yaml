@@ -21,6 +21,7 @@ on:
       - ".dvc/**"
       - "dvc.lock"
       - "dvc.yaml"
+  workflow_dispatch: {}
 
 jobs:
   data-tests:
