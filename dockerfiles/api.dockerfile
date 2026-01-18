@@ -12,6 +12,7 @@ WORKDIR /
 RUN uv sync --locked --no-cache --no-install-project
 
 COPY src src/
+COPY models models/
 
 RUN uv sync --locked --no-cache
 
