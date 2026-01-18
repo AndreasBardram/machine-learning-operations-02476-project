@@ -185,4 +185,4 @@ logs/
 lightning_logs/
 outputs/
 dvc-credentials.json
-data.dvc
+/data
