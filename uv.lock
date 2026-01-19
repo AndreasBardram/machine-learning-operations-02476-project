@@ -1953,6 +1953,7 @@ dependencies = [
     { name = "hydra-core" },
     { name = "ipykernel" },
     { name = "lightning", extra = ["pytorch-extra"] },
+    { name = "netron" },
     { name = "numpy" },
     { name = "onnx" },
     { name = "onnxruntime" },
@@ -1991,6 +1992,7 @@ requires-dist = [
     { name = "hydra-core", specifier = ">=1.3.2" },
     { name = "ipykernel", specifier = ">=7.1.0" },
     { name = "lightning", extras = ["pytorch-extra"], specifier = ">=2.6.0" },
+    { name = "netron", specifier = ">=8.8.3" },
     { name = "numpy", specifier = "<2" },
     { name = "onnx", specifier = ">=1.20.1" },
     { name = "onnxruntime", specifier = ">=1.23.2" },
@@ -2098,6 +2100,14 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/83/f8/51569ac65d696c8ecbee95938f89d4abf00f47d58d48f6fbabfe8f0baefe/nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe", size = 7418, upload-time = "2024-01-21T14:25:19.227Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/c4/c2971a3ba4c6103a3d10c4b0f24f461ddc027f0f09763220cf35ca1401b3/nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c", size = 5195, upload-time = "2024-01-21T14:25:17.223Z" },
+]
+
+[[package]]
+name = "netron"
+version = "8.8.3"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3b/00/4caee25e1a97ab33d2b154ac1bad539fa5ca91644da9ba3bdf2a2806c5fb/netron-8.8.3-py3-none-any.whl", hash = "sha256:d403e2a4e9aef33f918e1829757b43ce8c887f3ea245a6cf4ae0356309e7789e", size = 3203355, upload-time = "2026-01-16T16:11:34.158Z" },
 ]
 
 [[package]]
