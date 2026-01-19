@@ -28,14 +28,11 @@ def export_to_onnx(cfg: DictConfig) -> None:
         export_params=True,
         opset_version=14,
         do_constant_folding=True,
-        input_names=['input'],
-        output_names=['output'],
-        dynamic_axes={
-            'input': {0: 'batch_size'},
-            'output': {0: 'batch_size'}
-        }
+        input_names=["input"],
+        output_names=["output"],
+        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
     )
-    
+
     print(f"Model successfully exported to: {output_path}")
 
 
