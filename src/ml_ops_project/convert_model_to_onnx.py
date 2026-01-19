@@ -12,8 +12,7 @@ def export_to_onnx(cfg: DictConfig) -> None:
     model = TransactionModel(**cfg.model)
     model.eval()
 
-    # Create dummy input with correct shape
-    # Shape should be (batch_size, input_dim)
+    # Create dummy input
     input_dim = cfg.model.get("input_dim", 32)
     dummy_input = torch.randn(1, input_dim)
 
