@@ -63,6 +63,10 @@ docker build -f dockerfiles/train_transformer.dockerfile -t ml-ops-train-transfo
 
 # Evaluate model
 docker build -f dockerfiles/eval.dockerfile -t ml-ops-eval .
+
+# Run tests in Docker
+docker build -f dockerfiles/test.dockerfile -t ml-ops-tests .
+docker run --rm ml-ops-tests
 ```
 
 All images use `uv` for Python dependency management with Python 3.12.
