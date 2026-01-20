@@ -65,6 +65,17 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
     )
 
 
+@task
+def docker_test(ctx: Context, progress: str = "plain") -> None:
+    """Run tests in a Docker container."""
+    ctx.run(
+        f"docker build -t ml-ops-tests . -f dockerfiles/test.dockerfile --progress={progress}",
+        echo=True,
+        pty=not WINDOWS,
+    )
+    ctx.run("docker run --rm ml-ops-tests", echo=True, pty=not WINDOWS)
+
+
 # ONNX commands
 @task
 def run_onnx_api(ctx: Context) -> None:
