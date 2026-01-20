@@ -46,11 +46,26 @@ docker build -t ml-ops-app .
 # Run API (default)
 docker run --rm -p 8000:8000 ml-ops-app
 
+# General usage:
+#   docker run --rm [ports] [env] [volumes] ml-ops-app <mode> [args...]
+# Modes: api, onnx-api, preprocess, preprocess-transformer, train, train-transformer, eval
+# Example: mount data/models for train/eval
+docker run --rm -v "$PWD/data:/app/data" -v "$PWD/models:/app/models" ml-ops-app train trainer.max_epochs=1
+
 # Run training (mount data/models as needed)
 docker run --rm -v "$PWD/data:/app/data" -v "$PWD/models:/app/models" ml-ops-app train trainer.max_epochs=1
 
 # Run eval
 docker run --rm -v "$PWD/data:/app/data" -v "$PWD/models:/app/models" ml-ops-app eval
+
+# Environment variables for API and training
+# - PORT=8000
+# - MODEL_CHECKPOINT_PATH=/app/models/checkpoints_transformer/your.ckpt
+# - MODEL_CHECKPOINT_DIR=/app/models/checkpoints_transformer
+# - MODEL_NAME_OR_PATH=distilbert-base-uncased
+# - LABELS="Food & Dining,Transportation,..."
+# - MAX_LENGTH=64
+# - DEVICE=cpu
 
 # API image - runs FastAPI inference server
 docker build -f dockerfiles/api.dockerfile -t ml-ops-api .
