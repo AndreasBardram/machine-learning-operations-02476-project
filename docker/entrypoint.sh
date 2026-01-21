@@ -5,6 +5,13 @@ mode="${1:-api}"
 shift || true
 
 pull_models_if_needed() {
+  if [ -n "${GOOGLE_APPLICATION_CREDENTIALS_JSON:-}" ] && [ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
+    creds_path="${GOOGLE_APPLICATION_CREDENTIALS_PATH:-/tmp/gcp-key.json}"
+    printf "%s" "${GOOGLE_APPLICATION_CREDENTIALS_JSON}" > "${creds_path}"
+    export GOOGLE_APPLICATION_CREDENTIALS="${creds_path}"
+  elif [ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -f /app/dvc-credentials.json ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS=/app/dvc-credentials.json
+  fi
   if [ "${DVC_PULL_ON_STARTUP:-1}" = "0" ]; then
     return 0
   fi
