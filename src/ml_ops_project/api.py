@@ -117,6 +117,18 @@ def _labels_from_model_config(model: Any) -> list[str] | None:
     return None
 
 
+def _labels_from_lightning_hparams(lightning_model: Any) -> list[str] | None:
+    hparams = getattr(lightning_model, "hparams", None)
+    if hparams is None:
+        return None
+    labels = None
+    if isinstance(hparams, dict):
+        labels = hparams.get("labels")
+    else:
+        labels = getattr(hparams, "labels", None)
+    return labels if labels else None
+
+
 def _find_latest_ckpt(dir_path: Path) -> Path | None:
     if not dir_path.exists() or not dir_path.is_dir():
         return None
@@ -150,6 +162,8 @@ def create_predictor() -> Predictor:
         model_id = f"lightning_ckpt:{ckpt.as_posix()}"
         tokenizer_name = str(lightning_model.hparams.model_name_or_path)
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+        if labels is None:
+            labels = _labels_from_lightning_hparams(lightning_model)
     else:
         model_name_or_path = os.getenv("MODEL_NAME_OR_PATH", "distilbert-base-uncased")
         hf_model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path)
