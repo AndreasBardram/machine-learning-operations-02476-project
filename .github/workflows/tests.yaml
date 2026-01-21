@@ -156,18 +156,9 @@ jobs:
         run: |
           uv run coverage run -m pytest tests/ --ignore=tests/integrationtests
           uv run coverage report -m
-          uv run coverage xml -o coverage.xml
 
       - name: Run tests & coverage (macOS/Windows)
         if: runner.os != 'Linux'
         run: |
           coverage run -m pytest tests/ --ignore=tests/integrationtests
           coverage report -m
-
-      - name: Upload coverage to Codecov
-        if: runner.os == 'Linux' && matrix.python-version == '3.11'
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.xml
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
