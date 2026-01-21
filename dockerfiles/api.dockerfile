@@ -12,8 +12,6 @@ WORKDIR /
 RUN uv sync --locked --no-cache --no-install-project
 
 COPY src src/
-COPY models models/
-
 RUN uv sync --locked --no-cache
 
 ENTRYPOINT ["uv", "run", "uvicorn", "src.ml_ops_project.api:app", "--host", "0.0.0.0", "--port", "8000"]

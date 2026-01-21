@@ -13,6 +13,5 @@ COPY configs/ configs/
 WORKDIR /
 RUN uv sync --locked --no-cache --no-install-project
 
-RUN mkdir -p data
 
 ENTRYPOINT ["uv", "run", "src/ml_ops_project/train_transformer.py"]

@@ -8,7 +8,6 @@ COPY uv.lock uv.lock
 COPY pyproject.toml pyproject.toml
 COPY README.md README.md
 COPY src/ src/
-COPY models/ models/
 
 WORKDIR /
 RUN uv sync --locked --no-cache --no-install-project
