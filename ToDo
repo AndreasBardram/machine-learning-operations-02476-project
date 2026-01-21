@@ -34,11 +34,11 @@ Oscar [x] Create a data storage in GCP Bucket for your data and link this with y
 Oscar & Frederik [x] Create a trigger workflow for automatically building your docker images (M21)
 Freddy [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 Oscar [x] Create a FastAPI application that can do inference using your model (M22)
-Oscar [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
+Oscar [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
 Oscar & Andreas [x] Write API tests for your application and setup continues integration for these (M24)
 Oscar [ ] Load test your application (M24)
 Frederik [x] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
-Freddy [ ] Create a frontend for your API (M26)
+Freddy [x] Create a frontend for your API (M26)
 
 # Week 3
 Otto [ ] Check how robust your model is towards data drifting (M27)
