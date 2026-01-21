@@ -11,10 +11,9 @@ RUN uv sync --locked --no-cache --no-install-project
 
 COPY src/ src/
 COPY configs/ configs/
-COPY models/ models/
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh && mkdir -p data
+RUN chmod +x /usr/local/bin/entrypoint.sh && mkdir -p data models
 RUN uv sync --locked --no-cache
 
 EXPOSE 8000
