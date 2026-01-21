@@ -4,8 +4,20 @@ set -eu
 mode="${1:-api}"
 shift || true
 
+pull_models_if_needed() {
+  if [ "${DVC_PULL_ON_STARTUP:-1}" = "0" ]; then
+    return 0
+  fi
+  if [ -d models ] && [ -n "$(ls -A models 2>/dev/null)" ]; then
+    return 0
+  fi
+  echo "Models missing; pulling via DVC..."
+  uv run dvc pull models.dvc
+}
+
 case "$mode" in
   api)
+    pull_models_if_needed
     exec uv run uvicorn src.ml_ops_project.api:app --host 0.0.0.0 --port "${PORT:-8000}" "$@"
     ;;
   streamlit)
@@ -17,6 +29,7 @@ case "$mode" in
       "$@"
     ;;
   onnx-api)
+    pull_models_if_needed
     exec uv run src/ml_ops_project/onnx_fastapi.py "$@"
     ;;
   preprocess)
