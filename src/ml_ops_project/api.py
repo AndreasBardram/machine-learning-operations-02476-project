@@ -94,6 +94,26 @@ def _parse_labels_from_env() -> list[str] | None:
     return labels or None
 
 
+def _labels_from_model_config(model: Any) -> list[str] | None:
+    config = getattr(model, "config", None)
+    if config is None:
+        return None
+    id2label = getattr(config, "id2label", None)
+    if not id2label:
+        return None
+    if isinstance(id2label, dict):
+        try:
+            items = sorted(id2label.items(), key=lambda kv: int(kv[0]))
+        except Exception:
+            items = sorted(id2label.items(), key=lambda kv: str(kv[0]))
+        labels = [str(label) for _, label in items]
+        return labels or None
+    if isinstance(id2label, list):
+        labels = [str(label) for label in id2label]
+        return labels or None
+    return None
+
+
 def _find_latest_ckpt(dir_path: Path) -> Path | None:
     if not dir_path.exists() or not dir_path.is_dir():
         return None
@@ -104,7 +124,8 @@ def _find_latest_ckpt(dir_path: Path) -> Path | None:
 def create_predictor() -> Predictor:
     use_dummy = os.getenv("USE_DUMMY_PREDICTOR", "").strip().lower() in {"1", "true", "yes"}
     if use_dummy:
-        return DummyPredictor(labels=_parse_labels_from_env())
+        labels = _parse_labels_from_env() or ["DUMMY"]
+        return DummyPredictor(labels=labels)
 
     device_str = os.getenv("DEVICE", "cpu")
     device = torch.device(device_str)
@@ -131,6 +152,9 @@ def create_predictor() -> Predictor:
         hf_model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path)
         tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         model_id = model_name_or_path
+
+    if labels is None:
+        labels = _labels_from_model_config(hf_model)
 
     hf_model.to(device)
     hf_model.eval()
