@@ -1,6 +1,7 @@
 import json
 import urllib.error
 import urllib.request
+from contextlib import suppress
 from dataclasses import dataclass
 
 import streamlit as st
@@ -27,12 +28,10 @@ def _request_json(method: str, url: str, payload: dict | None = None, timeout: i
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8")
         if detail:
-            try:
+            with suppress(json.JSONDecodeError):
                 detail = json.loads(detail)
-            except json.JSONDecodeError:
-                pass
         return ApiResult(ok=False, data=None, error=f"HTTP {exc.code}: {detail}", status=exc.code)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         return ApiResult(ok=False, data=None, error=str(exc), status=None)
 
 
@@ -225,9 +224,7 @@ def main() -> None:
                     st.error(result.error or "Batch prediction failed.")
 
     st.write("")
-    st.info(
-        "Tip: Set `USE_DUMMY_PREDICTOR=1` when running the API for fast local demos without loading a model."
-    )
+    st.info("Tip: Set `USE_DUMMY_PREDICTOR=1` when running the API for fast local demos without loading a model.")
 
 
 if __name__ == "__main__":
