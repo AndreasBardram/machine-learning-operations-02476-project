@@ -30,6 +30,10 @@ By default it targets `http://127.0.0.1:8000`. Start the FastAPI server first or
 The integration tests call a running API over HTTP (via `httpx`) and use `MYENDPOINT` to know where it is deployed.
 If `MYENDPOINT` is not set, these tests are skipped.
 
+## Unit Tests
+Run the full unit test suite with coverage:
+- `uv run invoke test`
+
 Run locally with a lightweight dummy predictor (fast startup, no model downloads):
 - `USE_DUMMY_PREDICTOR=1 uv run uvicorn src.ml_ops_project.api:app --host 127.0.0.1 --port 8000`
 - `MYENDPOINT=http://127.0.0.1:8000 uv run pytest -q tests/integrationtests`
@@ -104,7 +108,7 @@ docker run --rm ml-ops-tests
 All images use `uv` for Python dependency management with Python 3.12.
 
 ## Code Coverage:
-Coverage: 95.0%
+Coverage: 93.0% (run `uv run invoke test`)
 
 ### Goal
 Build an end-to-end ML system that classifies short transaction descriptions (receipt line-items / bank statement text) into spending categories (e.g., Food & Dining, Transportation, Utilities, Shopping). Input is a single text string, output is a predicted category + confidence. The project emphasizes a reproducible MLOps pipeline: data download + preprocessing, training + evaluation, experiment tracking, packaging and deployment of an inference API, and automated testing/CI.
