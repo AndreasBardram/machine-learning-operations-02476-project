@@ -6,7 +6,7 @@ import lightning as l
 import torch
 from omegaconf import DictConfig, OmegaConf
 
-from ml_ops_project.data_transformer import TextDataModule
+from ml_ops_project.data_transformer import TextDataModule, load_label_list
 from ml_ops_project.model_transformer import TransformerTransactionModel
 
 torch.set_float32_matmul_precision("high")
@@ -36,8 +36,9 @@ def main(cfg: DictConfig) -> None:
     l.seed_everything(seed)
     log.info(f"Seed set to: {seed}")
 
-    model = TransformerTransactionModel(**cfg.model)
     datamodule = TextDataModule(**cfg.data)
+    label_list = load_label_list(datamodule.data_root)
+    model = TransformerTransactionModel(**cfg.model, labels=label_list)
     log.info("Transformer model and DataModule loaded")
 
     trainer_cfg = OmegaConf.to_container(cfg.trainer, resolve=True)

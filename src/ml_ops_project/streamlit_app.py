@@ -124,8 +124,8 @@ def _render_predictions(predictions: list[dict]) -> None:
         st.info("No predictions returned.")
         return
     for pred in predictions:
-        label = pred.get("label") or "Unknown"
         label_id = pred.get("label_id")
+        label = pred.get("label") or (f"Label {label_id}" if label_id is not None else "Unknown")
         confidence = float(pred.get("confidence", 0.0))
         cols = st.columns([2, 1, 1])
         cols[0].metric("Label", label)
@@ -211,11 +211,13 @@ def main() -> None:
                     predictions = result.data.get("predictions", [])
                     rows = []
                     for text, pred in zip(texts, predictions, strict=False):
+                        label_id = pred.get("label_id")
                         rows.append(
                             {
                                 "text": text,
-                                "label": pred.get("label") or "Unknown",
-                                "label_id": pred.get("label_id"),
+                                "label": pred.get("label")
+                                or (f"Label {label_id}" if label_id is not None else "Unknown"),
+                                "label_id": label_id,
                                 "confidence": round(float(pred.get("confidence", 0.0)), 3),
                             }
                         )

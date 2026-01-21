@@ -12,6 +12,7 @@ class TransformerTransactionModel(pl.LightningModule):
         learning_rate: float = 2e-5,  # noqa: ARG002
         weight_decay: float = 0.01,  # noqa: ARG002
         freeze_backbone: bool = False,
+        labels: list[str] | None = None,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -19,6 +20,12 @@ class TransformerTransactionModel(pl.LightningModule):
 
         # Ensure model is in train mode (AutoModel can sometimes init in eval mode)
         self.model.train()
+
+        if labels:
+            id2label = dict(enumerate(labels))
+            label2id = {label: i for i, label in enumerate(labels)}
+            self.model.config.id2label = id2label
+            self.model.config.label2id = label2id
 
         if freeze_backbone:
             print("Freezing backbone model parameters...")

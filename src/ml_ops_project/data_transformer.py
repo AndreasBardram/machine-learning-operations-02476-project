@@ -12,6 +12,17 @@ SAVED_NAME = "transactiq_enriched_hf"
 PROCESSED_NAME_TEXT = "transactiq_processed_text"
 
 
+def load_label_list(data_root: Path) -> list[str]:
+    raw_path = data_root / "raw" / SAVED_NAME
+    if not raw_path.exists():
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        ds = load_dataset(DATASET_ID)
+        ds.save_to_disk(raw_path)
+    ds = load_from_disk(str(raw_path))
+    full_ds_for_labels = ds["train"] if hasattr(ds, "keys") and "train" in ds else ds
+    return sorted(full_ds_for_labels.unique("category"))
+
+
 class TextDataset(Dataset):
     def __init__(self, data_path: Path):
         self.data_path = data_path
@@ -84,9 +95,7 @@ class TextDataModule(pl.LightningDataModule):
             # misses a class.
             # Ideally we should use the full dataset to get unique categories, or hardcode them if known.
             # Since we loaded the full raw ds above (ds), let's use that for label mapping
-            full_ds_for_labels = ds["train"] if hasattr(ds, "keys") and "train" in ds else ds
-
-            unique_categories = sorted(full_ds_for_labels.unique("category"))
+            unique_categories = load_label_list(self.data_root)
             label2id = {label: i for i, label in enumerate(unique_categories)}
 
             print(f"Tokenizing data with {self.model_name_or_path}...")
