@@ -53,31 +53,34 @@ class TransformerTransactionModel(pl.LightningModule):
     def training_step(self, batch):
         outputs = self(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
         loss = outputs.loss
-        self.log("train_loss", loss, prog_bar=True)
+        if self.trainer is not None:
+            self.log("train_loss", loss, prog_bar=True)
 
-        preds = torch.argmax(outputs.logits, dim=1)
-        acc = (preds == batch["labels"]).float().mean()
-        self.log("train_acc", acc, prog_bar=True)
+            preds = torch.argmax(outputs.logits, dim=1)
+            acc = (preds == batch["labels"]).float().mean()
+            self.log("train_acc", acc, prog_bar=True)
         return loss
 
     def validation_step(self, batch):
         outputs = self(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
         loss = outputs.loss
-        self.log("val_loss", loss, prog_bar=True)
+        if self.trainer is not None:
+            self.log("val_loss", loss, prog_bar=True)
 
-        preds = torch.argmax(outputs.logits, dim=1)
-        acc = (preds == batch["labels"]).float().mean()
-        self.log("val_acc", acc, prog_bar=True)
+            preds = torch.argmax(outputs.logits, dim=1)
+            acc = (preds == batch["labels"]).float().mean()
+            self.log("val_acc", acc, prog_bar=True)
         return loss
 
     def test_step(self, batch):
         outputs = self(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
         loss = outputs.loss
-        self.log("test_loss", loss, prog_bar=True)
+        if self.trainer is not None:
+            self.log("test_loss", loss, prog_bar=True)
 
-        preds = torch.argmax(outputs.logits, dim=1)
-        acc = (preds == batch["labels"]).float().mean()
-        self.log("test_acc", acc, prog_bar=True)
+            preds = torch.argmax(outputs.logits, dim=1)
+            acc = (preds == batch["labels"]).float().mean()
+            self.log("test_acc", acc, prog_bar=True)
         return loss
 
     def configure_optimizers(self):
