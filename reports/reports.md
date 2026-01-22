@@ -474,7 +474,22 @@ Yes. The main FastAPI app (`src/ml_ops_project/api.py`) loads the newest checkpo
 >
 > Answer:
 
-Deployment targets Cloud Run via `deploy-cloud-run.yaml`. GitHub Actions builds `ml-ops-app`, pushes to Artifact Registry, and deploys two services: API on port 8000 and Streamlit UI on port 8501 with `API_BASE_URL` set to the API URL. Locally we validated with `docker run -p 8000:8000 ml-ops-app` then `curl -X POST http://localhost:8000/predict -d '{\"text\":\"STARBUCKS\"}'`. Cloud Run is invoked similarly with the deployed URL; auth is open for the demo, and redeploys are triggered automatically on pushes to `main` after tests succeed, which keeps drift between UI/API low. The ONNX API can be deployed the same way by switching the entrypoint argument and exposing port 8000.
+We deployed the API both locally and in the cloud. Locally, we run the FastAPI app with:
+
+uv run uvicorn src.ml_ops_project.api:app --host 0.0.0.0 --port 8000 --reload
+
+We then send requests to http://localhost:8000/predict.
+
+For cloud deployment, GitHub Actions builds a Docker image, pushes it to Artifact Registry, and deploys it to Cloud Run. 
+
+The API is invoked with a POST request with JSON:
+
+curl -X POST "<CLOUD_RUN_URL>/predict" \
+-H "Content-Type: application/json" \
+-d '{"text":"STARBUCKS"}'
+
+here the <CLOUD_RUN_URL> is the Cloud Run URL.
+This call then returns the predicted category and confidence of the input transaction. 
 
 ### Question 25
 
