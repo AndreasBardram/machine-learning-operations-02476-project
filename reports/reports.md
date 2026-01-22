@@ -218,7 +218,7 @@ Linting is enforced with Ruff (`make check` / `uv run invoke lint`) and formatti
 >
 > Answer:
 
-There are 37 tests. They cover preprocessing (baseline and transformer tokenization/label mapping), model construction, training scripts, and FastAPI handlers. Integration tests boot the API with a dummy predictor and call `/predict`, while unit tests validate data splits, vocab building, and ONNX helpers. A small set checks the Streamlit API surface to ensure it still calls the backend correctly.
+Our tests cover preprocessing (baseline and transformer tokenization/label mapping), model construction, training scripts, and FastAPI handlers. Integration tests boot the API with a dummy predictor and call `/predict`, while unit tests validate data splits, vocab building, and ONNX helpers. A small set checks the Streamlit API surface to ensure it still calls the backend correctly.
 
 ### Question 8
 
@@ -233,7 +233,8 @@ There are 37 tests. They cover preprocessing (baseline and transformer tokenizat
 >
 > Answer:
 
-Coverage is 91% (see README snippet). Even at 100% I wouldn’t assume correctness: coverage only means lines executed, not that edge cases or semantics were validated. Logic bugs, error handling paths, and integration behavior (e.g., GCP auth, ONNX runtime differences) can still fail despite line hits. That is why we pair coverage with integration tests, load tests, and manual sanity checks on predictions, and we spot-check model outputs against curated receipts after each training run to catch silent regressions and data drift early. Mutation testing or property-based tests would further increase trust, alongside canary deploys and shadow traffic experiments internally.
+Our code coverage is currently at 91% (see the bottom of the project README.md for details). This is a relatively high number and can make it easy to feel confident that most of the codebase is well tested. However, code coverage mainly indicates which lines of code are executed during tests, not how thoroughly the underlying logic is validated. Even with high coverage, important edge cases, unusual inputs, or error-handling paths may not be exercised in a meaningful way.
+For these reasons, coverage is best viewed as one signal among many. It helps identify untested areas, but it needs to be complemented by careful test design, targeted edge-case testing, and practical validation to build confidence in the system’s behavior.
 
 ### Question 9
 
@@ -248,7 +249,7 @@ Coverage is 91% (see README snippet). Even at 100% I wouldn’t assume correctne
 >
 > Answer:
 
-Yes. Features and experiments landed on short-lived branches (`feature/onnx-api`, `ci/cache`, etc.) with PRs into `main`. PRs required green CI (lint + tests + API integration) and at least one review. This kept the Cloud Run deployment workflow guarded because only merged PRs triggered the deploy job. When experimenting with sweeps we used draft PRs to discuss config changes before merging, and we rebased regularly to keep the matrix CI from drifting across OS/Python versions. Merge commits were avoided to keep the history linear and easy to bisect, and we tagged releases that correspond to deployed Cloud Run revisions for traceability.
+Yes and no. We all used local branches to work on and made sure our main branch was clean and protected, so only the finished, and polished code was uploaded to it. We did not utilize Pull Requests or did code review of each others code. We do recognize that this would have creates a better workflow, since having a second pair of eyes look through your code during a code review is very valuable. It would also have made it easier to track and follow what eachother worked on, which at some points in the project was a bit unclear.We did make an effort on utilizing good coding pratices by using the ruff framework and only pushed code to main that had passed both ruff format and ruff check.
 
 ### Question 10
 
