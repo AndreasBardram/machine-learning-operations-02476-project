@@ -1,7 +1,7 @@
 # Checklist for report questions: 
 
 - [x] question 1  
-- [ ] question 2    
+- [x] question 2    
 -Oscar [x] question 3 - potentially recheck Otto
 -Oscar [x] question 4   
 - [x] question 5   
