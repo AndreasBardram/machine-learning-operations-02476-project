@@ -6,9 +6,9 @@
 -Oscar [x] question 4   
 - [ ] question 5   
 -Oscar [x] question 6   
-- [ ] question 7   
-- [ ] question 8   
-- [ ] question 9   
+- [x] question 7   
+- [x] question 8   
+- [x] question 9   
 - [ ] question 10   
 - [ ] question 11   
 - [ ] question 12   
