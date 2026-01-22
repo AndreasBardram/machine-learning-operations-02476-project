@@ -114,6 +114,21 @@ All images use `uv` for Python dependency management with Python 3.12.
 ## Code Coverage:
 Coverage: run `uv run invoke test`.
 
+Coverage report 21-01-2026
+
+Name                                      Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------
+src/ml_ops_project/__init__.py                0      0   100%
+src/ml_ops_project/api.py                   146     21    86%   47, 56-57, 104-117, 123, 138-139, 155
+src/ml_ops_project/data.py                  106      5    95%   55-56, 138-139, 143
+src/ml_ops_project/data_transformer.py       85      3    96%   18-20
+src/ml_ops_project/model.py                  54      8    85%   84-94
+src/ml_ops_project/model_transformer.py      57     12    79%   57-61, 68-72, 79-83
+src/ml_ops_project/train.py                  44      1    98%   62
+src/ml_ops_project/train_transformer.py      45      1    98%   63
+-----------------------------------------------------------------------
+TOTAL                                       537     51    91%
+
 ### Goal
 Build an end-to-end ML system that classifies short transaction descriptions (receipt line-items / bank statement text) into spending categories (e.g., Food & Dining, Transportation, Utilities, Shopping). Input is a single text string, output is a predicted category + confidence. The project emphasizes a reproducible MLOps pipeline: data download + preprocessing, training + evaluation, experiment tracking, packaging and deployment of an inference API, and automated testing/CI.
 

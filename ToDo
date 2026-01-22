@@ -36,7 +36,7 @@ Freddy [x] Get your model training in GCP using either the Engine or Vertex AI (
 Oscar [x] Create a FastAPI application that can do inference using your model (M22)
 Oscar [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
 Oscar & Andreas [x] Write API tests for your application and setup continues integration for these (M24)
-Oscar [ ] Load test your application (M24)
+Oscar [x] Load test your application (M24)
 Frederik [x] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 Freddy [x] Create a frontend for your API (M26)
 
