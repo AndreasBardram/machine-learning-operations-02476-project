@@ -10,11 +10,11 @@
 - [x] question 8   
 - [x] question 9   
 - [ ] question 10   
-- [X] question 11   
+-Andreas [X] question 11   
 -Otto [x] question 12   
 -Otto [x] question 13   
 -Otto [ ] question 14   
-- [ ] question 15   
+- Andreas [X] question 15   
 -Otto [ ] question 16   
 - freddy [ ] question 17   
 - [ ] question 18   

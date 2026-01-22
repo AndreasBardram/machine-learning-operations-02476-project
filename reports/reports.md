@@ -348,7 +348,7 @@ Our W&B runs log loss, weighted F1, learning rate schedule, and class-level prec
 >
 > Answer:
 
-Docker is used for both local parity and Cloud Run. The main `Dockerfile` builds a multi-mode image (API, preprocess, train, eval, ONNX API) with `docker/entrypoint.sh` dispatching commands. Component images in `dockerfiles/` target CI-friendly tasks: `train.dockerfile`, `api.dockerfile`, `onnx.dockerfile`, etc. Example: `docker build -t ml-ops-app .` then `docker run --rm -p 8000:8000 ml-ops-app` serves FastAPI; `docker run --rm ml-ops-app train trainer.max_epochs=1` runs a short training job. There is also a slim ONNX image for CPU inference. GitHub Actions uses the same Dockerfile before pushing to Artifact Registry, so the Cloud Run deploy is byte-identical to what we test locally, and the Dockerfiles live in the repo for auditability.
+Docker is used for both local parity and Cloud Run. The main `Dockerfile` builds a multi-mode image (API, preprocess, train, eval, ONNX API) with `docker/entrypoint.sh` dispatching commands. Component images in `dockerfiles/` target CI-friendly tasks: `train.dockerfile`, `api.dockerfile`, `onnx.dockerfile`, etc. Example: `docker build -t ml-ops-app .` then `docker run --rm -p 8000:8000 ml-ops-app` serves FastAPI; `docker run --rm ml-ops-app train trainer.max_epochs=1` runs a short training job. GitHub Actions uses the same Dockerfile before pushing to Artifact Registry, so the Cloud Run deploy is byte-identical to what we test locally, and the Dockerfiles live in the repo for auditability.
 
 ### Question 16
 
