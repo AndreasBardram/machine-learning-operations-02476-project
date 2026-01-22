@@ -184,7 +184,7 @@ Dependencies are managed with `uv` using `pyproject.toml` + `uv.lock` for exact 
 >
 > Answer:
 
-We started from the cookiecutter MLOps layout and kept the core `src/ml_ops_project` package. We filled out `data.py`/`data_transformer.py` for baseline + transformer preprocessing, `model.py`/`model_transformer.py` for TF-IDF and DistilBERT heads, and `train*.py` entrypoints. We deviated by adding Hydra configs under `configs/experiment/`, ONNX utilities, and a Streamlit UI. `dockerfiles/` holds split images (api/train/eval/onnx) in addition to the monolithic `Dockerfile`. We also added `tasks.py` with Invoke tasks, a `docs/` MkDocs site, and DVC-tracked `data.dvc`/`models.dvc` files. Notebooks live in `notebooks/` for exploration, and Locust CSVs plus notes live in `docs/load_tests/` so load-test evidence ships with the repo.
+We started from the cookiecutter MLOps layout and kept the core `src/ml_ops_project` package. We filled out `data.py`/`data_transformer.py` for baseline + transformer preprocessing, `model.py`/`model_transformer.py` for DistilBERT heads, and `train*.py` entrypoints. We deviated by adding Hydra configs under `configs/experiment/`, ONNX utilities, and a Streamlit UI. `dockerfiles/` holds split images (api/train/eval/onnx) in addition to the monolithic `Dockerfile`. We also extended the `tasks.py` with Invoke tasks for most of our scripts, a `docs/` MkDocs site, and DVC-tracked `data.dvc`/`models.dvc` files. Notebooks live in `notebooks/` for data comparison, and Locust CSVs plus notes live in `docs/load_tests/` so load-test evidence ships with the repo.
 
 ### Question 6
 
