@@ -380,7 +380,11 @@ We debugged API issues with pytest + httpx integration tests and FastAPI’s `Te
 >
 > Answer:
 
-We used GCS (artifact storage for DVC data/models), Artifact Registry (Docker images), Cloud Run (API + Streamlit deployment), and Cloud Build via GitHub Actions for image builds. Workload Identity Federation handled auth from GitHub without static keys. Cloud Monitoring was only lightly used for checking Run service metrics, mainly CPU/memory and request counts during load testing.
+we used the following GCP services: 
+- Google Cloud Storage (GCS)                    (to store models and data via DVC)
+- Artifact Registry                             (to store our docker images)
+- Cloud Run                                     (to host the API and frontend)
+- IAM Workload Identity Federation:             (for GitHub Actions to access GCP)
 
 ### Question 18
 
