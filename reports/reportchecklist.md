@@ -16,16 +16,16 @@
 - [ ] question 14   
 - [ ] question 15   
 - [ ] question 16   
-- [ ] question 17   
+- freddy [ ] question 17   
 - [ ] question 18   
 - [ ] question 19   
 - [ ] question 20   
 - [ ] question 21   
 - [ ] question 22   
 - [ ] question 23   
-- [ ] question 24   
-- [ ] question 25   
-- [ ] question 26   
+- freddy [ ] question 24   
+- freddy [ ] question 25   
+- freddy [ ] question 26   
 - [ ] question 27   
 - [ ] question 28   
 - [ ] question 29   
