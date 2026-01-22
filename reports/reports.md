@@ -123,7 +123,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
-Droup 38
+Group 38
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +134,7 @@ Droup 38
 >
 > Answer:
 
-s204722, 
+s204722, s204213, 
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
