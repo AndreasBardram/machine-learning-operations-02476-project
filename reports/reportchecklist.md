@@ -16,7 +16,7 @@
 -Otto [ ] question 14   
 - Andreas [X] question 15   
 -Otto [ ] question 16   
-- freddy [ ] question 17   
+- freddy [x] question 17   
 - [ ] question 18   
 - [ ] question 19   
 - [ ] question 20   
