@@ -1,5 +1,9 @@
 import os
 import json
+
+import pandas as pd
+
+from pathlib import Path
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -250,3 +254,98 @@ def predict(req: PredictRequest, background_tasks: BackgroundTasks) -> PredictRe
     background_tasks.add_task(save_data_to_bucket, texts, pred_dicts, predictor.model_id)
 
     return PredictResponse(predictions=preds, model=predictor.model_id)
+
+
+def download_files(n: int = 5):
+    from google.cloud import storage
+
+    # load current data from bucket
+    bucket_name = os.getenv("DATA_BUCKET_NAME")
+    if not bucket_name:
+        raise ValueError("DATA_BUCKET_NAME environment variable is not set.")
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+
+    # data is stored in folder "predictions/" as prediction_{timestamp}.json
+    blobs = bucket.list_blobs(prefix="predictions/")
+    blobs.sort(key=lambda x: x.updated, reverse=True)
+    latest_blobs = blobs[:n]
+
+    for blob in latest_blobs:
+        blob.download_to_filename(blob.name)
+
+
+def load_latest_files(directory: Path, n: int = 5):
+    """
+    Load latest n files from the from the directory
+    """
+    # download latest n files from the bucket
+    download_files(n=n)
+
+    # get all prediction files in the predictions/ folder
+    files = directory.glob("predictions/prediction_*.json")
+
+    # sort files by when they were created
+    files = sorted(files, key=os.path.getmtime)
+
+    # load latest n files
+    latest_files = files[-n:]
+
+    data = {"texts": [], "target": []}
+    for file in latest_files:
+        with open(file, "r") as f:
+            data = json.load(f)
+            data["texts"].extend(data.get("texts", []))
+            data["target"].extend(data.get("predictions", []))
+    df = pd.DataFrame(data)
+    return df
+
+
+def generate_drift_report(reference_data: pd.DataFrame, prediction_data: pd.DataFrame) -> str:
+    from evidently import Dataset, DataDefinition
+    from evidently.presets import DataDriftPreset
+    from evidently.report import Report
+
+    data_definition = DataDefinition(
+        text_columns=["texts"],
+        categorical_columns=["target"],
+    )
+
+    reference_dataset = Dataset(data=reference_data, data_definition=data_definition)
+    prediction_dataset = Dataset(data=prediction_data, data_definition=data_definition)
+
+    preset = DataDriftPreset()
+    report = Report(metrics=[preset])
+    report.run(reference_data=reference_dataset, current_data=prediction_dataset)
+
+    # generate HTML report
+    html_report = report.as_html()
+    return html_report
+
+@app.get("/")
+async def data_drift_report():
+    """
+    Endpoint for data drift monitoring.
+    """
+    from evidently import Dataset, DataDefinition
+    from evidently.presets DataDriftPreset
+    from google.cloud import storage
+
+    # load reference data (training data)
+    reference_data = ""
+
+    # load latest data from the bucket
+    prediction_data = load_latest_files(".", n=5)
+
+
+
+    
+
+
+
+
+    
+
+
+
+
