@@ -2,10 +2,10 @@
 
 - [ ] question 1  
 - [ ] question 2    
-- [ ] question 3   
-- [ ] question 4   
+-Oscar [x] question 3 - potentially recheck Otto
+-Oscar [x] question 4   
 - [ ] question 5   
-- [ ] question 6   
+-Oscar [x] question 6   
 - [ ] question 7   
 - [ ] question 8   
 - [ ] question 9   
