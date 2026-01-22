@@ -1,10 +1,10 @@
 # Checklist for report questions: 
 
-- [ ] question 1  
+- [x] question 1  
 - [ ] question 2    
 -Oscar [x] question 3 - potentially recheck Otto
 -Oscar [x] question 4   
-- [ ] question 5   
+- [x] question 5   
 -Oscar [x] question 6   
 - [x] question 7   
 - [x] question 8   
