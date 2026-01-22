@@ -11,11 +11,11 @@
 - [x] question 9   
 - [ ] question 10   
 - [ ] question 11   
-- [ ] question 12   
-- [ ] question 13   
-- [ ] question 14   
+-Otto [ ] question 12   
+-Otto [ ] question 13   
+-Otto [ ] question 14   
 - [ ] question 15   
-- [ ] question 16   
+-Otto [ ] question 16   
 - freddy [ ] question 17   
 - [ ] question 18   
 - [ ] question 19   
@@ -27,6 +27,6 @@
 - freddy [ ] question 25   
 - freddy [ ] question 26   
 - freddy [ ] question 27   
-- [ ] question 28   
+-Otto [ ] question 28   
 - [ ] question 29   
 - [ ] question 30   
