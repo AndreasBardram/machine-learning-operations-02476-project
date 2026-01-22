@@ -10,7 +10,7 @@
 - [x] question 8   
 - [x] question 9   
 - [ ] question 10   
-- [ ] question 11   
+- [X] question 11   
 -Otto [x] question 12   
 -Otto [x] question 13   
 -Otto [ ] question 14   
