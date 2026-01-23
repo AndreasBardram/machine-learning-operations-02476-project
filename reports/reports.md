@@ -593,6 +593,8 @@ Extras include a Streamlit UI that calls the API, an ONNX FastAPI for CPU-friend
 
 The pipeline begins with raw CSV receipt lines. Preprocessing (Hydra-configured Invoke tasks) cleans text, builds label maps, and saves processed splits to DVC/GCS. Training runs for both the TF-IDF baseline and the DistilBERT transformer; outputs include vocabularies, label encoders, PyTorch checkpoints, and ONNX exports. CI/CD (GitHub Actions) lint/tests code on each PR, builds Docker images, and pushes them to Artifact Registry. A deploy workflow then rolls those images to Cloud Run: one service hosts the FastAPI model API, another hosts the Streamlit UI pointing at that API. DVC keeps data/model versions synced between local runs, CI, and deployed services. Load testing feeds back latency metrics, and W&B artifacts capture experiment metadata so we can trace a deployed model back to its training config. Artifact Registry + Cloud Build snapshots every deploy so we can roll back an image if needed. Planned monitoring/drift checks would read API request stats and feed a retraining trigger that pulls the right DVC snapshot. Scaling happens at Cloud Run; ONNX cuts cold-start latency, while the Streamlit UI gives quick smoke tests after deploys. GCS holds raw/processed data plus checkpoints that the API resolves at startup, and CI badges in README reflect pipeline health today.
 
+check reports/figures/overview.png
+
 ### Question 30
 
 > **Discuss the overall struggles of the project. Where did you spend most time and what did you do to overcome these**
