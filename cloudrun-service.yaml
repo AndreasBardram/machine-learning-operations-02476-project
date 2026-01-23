@@ -1,0 +1,32 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ml-ops-api
+  namespace: mlops-484110
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      serviceAccountName: dvc-796@mlops-484110.iam.gserviceaccount.com
+      containers:
+        - name: api
+          image: europe-north1-docker.pkg.dev/mlops-484110/mlops-repo/ml-ops-app:adb9397f0daf3361dd7526172826f4928ce70db2
+          ports:
+            - containerPort: 8000
+        - name: prometheus
+          image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:0.10.1
+          args:
+            - "--config.file=/etc/prometheus/config.yaml"
+            - "--web.listen-address=:9090"
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+      volumes:
+        - name: prometheus-config
+          secret:
+            secretName: prometheus-sidecar-config
+            items:
+              - key: latest
+                path: config.yaml
