@@ -71,6 +71,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
+          sed -i "s|image: .*ml-ops-app:.*|image: ${IMAGE}|" cloudrun-service.yaml
           gcloud run services replace cloudrun-service.yaml \
             --region "${REGION}" \
             --project "${PROJECT_ID}"
