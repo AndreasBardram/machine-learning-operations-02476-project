@@ -512,7 +512,13 @@ transaction.
 >
 > Answer:
 
-Unit tests hit the Pydantic schemas and predict handler; integration tests spin up FastAPI and assert responses for single/batch payloads. For load testing we used Locust (`locustfile.py`) against `/predict`. In the baseline run (`docs/load_tests/locust_baseline_stats.csv`), we reached ~26 req/s aggregated with 0% failures; median latency was 160 ms and p95 about 1.4 s for POST /predict on a laptop. ONNX reduced p95 by ~25% in a follow-up batch test. These numbers guided ONNX optimizations and Cloud Run CPU sizing (min instances off, max concurrency 80), and health-checks were included to avoid noisy errors during ramp-up and cooldown phases in production environments.
+We did both unit testing and load testing of the API. Unit tests are written with pytest in tests/. 
+the tests cover request validation, single/batch prediction responses, and health checks.
+For the integration tests in tests/integrationtests/ we used a dummy predictor to verify the api. 
+For load testing we used Locust (locustfile.py) with the Cloud Run URL. 
+here we ran two scenarios, one was baseline batch size 1 and the second was batch size 8 (25 users, 5 users/s, 60s). 
+Here baseline achieved ~26 req/s with 0 failures and with a /predict latency median of ~170 ms and p95 ~1700 ms. 
+When we tested with Batch size 8 we achieved ~14 req/s with 0 failures with a predict median of ~440 ms and p95 ~4800 ms. The raw Locust CSVs are stored under docs/load_tests/ and the summary is found in docs/load_test_results.md.
 
 ### Question 26
 
@@ -526,8 +532,15 @@ Unit tests hit the Pydantic schemas and predict handler; integration tests spin 
 > *measure ... and ... that would inform us about this ... behaviour of our application.*
 >
 > Answer:
+We implemented monitoring for the deployed API. The FastAPI service exposes
+Prometheus metrics on /metrics (request count, error count, latency, input
+length). In the Cloud Run, the service is run with a Prometheus container
+that scrapes /metrics and writes a WAL, and a Stackdriver Prometheus sidecar
+that reads the WAL and forwards metrics to Cloud Monitoring.
+this then allows us to view the custom metrics google clouds metrics explorer together with the default cloud run metrics. 
+We also added a Monitoring alert policy with an email notification that triggers when the API error rate
+Exceeds a threshold. ex. abnormal request patternsthat could indicate model drift or misuse.
 
-Lightweight monitoring is in place: FastAPI logs request/response times, and Locust load tests capture latency distributions. Cloud Run metrics (CPU/memory, request count) were checked through the console during deploys, but we did not wire up alerts. A next step would be to push structured logs/metrics to Cloud Monitoring and add alerts on p95 latency/error rate plus drift signals on prediction distributions to catch category shift. That would let us page before the Streamlit UI or clients see degradations and support SLOs for latency/availability. We also plan to persist prediction distributions for offline drift analysis via a small scheduled cron job.
 
 ## Overall discussion of project
 
