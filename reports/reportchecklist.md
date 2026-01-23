@@ -26,7 +26,7 @@
 - freddy [x] question 24   
 - freddy [x] question 25   
 - freddy [x] question 26   
-- freddy [x] question 27   
--Otto [ ] question 28   
-- Andreas [X] question 29   
-- [X] question 30   
+- freddy [x] question 27    
+-Otto [x] question 28   
+- Andreas [x] question 29   
+- [x] question 30   

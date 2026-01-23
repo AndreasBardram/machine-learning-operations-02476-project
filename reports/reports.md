@@ -574,7 +574,7 @@ We spent ~12 USD-equivalent credits in total on the project.  Most of it went to
 >
 > Answer:
 
-Extras include a Streamlit UI that calls the API, an ONNX FastAPI for CPU-friendly inference, and GitHub Actions workflows reacting to DVC/model changes. We also kept a small MkDocs site and stored Locust CSVs to document load-testing results.
+Extras include a Streamlit UI that calls the API, an ONNX FastAPI for CPU-friendly inference, and GitHub Actions workflows reacting to DVC/model changes. We also kept a small MkDocs site and stored Locust CSVs to document load-testing results. Furthermore, we also made a data drift detection endpoint "/report" that compares the distribution of the training data, and the data provided to the API, when predictions are made.
 
 ### Question 29
 
