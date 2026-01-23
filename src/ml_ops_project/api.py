@@ -141,6 +141,17 @@ def _find_latest_ckpt(dir_path: Path) -> Path | None:
     return ckpts[0] if ckpts else None
 
 
+def _find_latest_ckpt_in_dirs(dir_paths: list[Path]) -> Path | None:
+    candidates: list[Path] = []
+    for dir_path in dir_paths:
+        ckpt = _find_latest_ckpt(dir_path)
+        if ckpt is not None:
+            candidates.append(ckpt)
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
 def create_predictor() -> Predictor:
     use_dummy = os.getenv("USE_DUMMY_PREDICTOR", "").strip().lower() in {"1", "true", "yes"}
     if use_dummy:
@@ -157,7 +168,16 @@ def create_predictor() -> Predictor:
     if checkpoint_path:
         ckpt = Path(checkpoint_path)
     else:
-        ckpt = _find_latest_ckpt(Path(os.getenv("MODEL_CHECKPOINT_DIR", "models/checkpoints_transformer")))
+        checkpoint_dir = os.getenv("MODEL_CHECKPOINT_DIR")
+        if checkpoint_dir:
+            ckpt = _find_latest_ckpt(Path(checkpoint_dir))
+        else:
+            ckpt = _find_latest_ckpt_in_dirs(
+                [
+                    Path("models/checkpoints_transformer"),
+                    Path("models/checkpoints_transformer_subset"),
+                ]
+            )
 
     if ckpt and ckpt.exists():
         if TransformerTransactionModel is None:
