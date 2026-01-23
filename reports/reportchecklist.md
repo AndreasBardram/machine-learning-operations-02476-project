@@ -16,14 +16,14 @@
 -Otto [ ] question 14   
 - Andreas [X] question 15   
 -Otto [ ] question 16   
-- freddy [x] question 17   
+- freddy [X] question 17   
 - [ ] question 18   
 - [ ] question 19   
 - [ ] question 20   
 - [ ] question 21   
 - [ ] question 22   
 - [ ] question 23   
-- freddy [ ] question 24   
+- freddy [X] question 24   
 - freddy [ ] question 25   
 - freddy [ ] question 26   
 - freddy [ ] question 27   
