@@ -1,0 +1,32 @@
+# Checklist for report questions: 
+
+- [x] question 1  
+- [x] question 2    
+-Oscar [x] question 3 - potentially recheck Otto
+-Oscar [x] question 4   
+- [x] question 5   
+-Oscar [x] question 6   
+- [x] question 7   
+- [x] question 8   
+- [x] question 9   
+-Oscar [x] question 10   
+-Andreas [X] question 11   
+-Otto [x] question 12   
+-Otto [x] question 13   
+-Otto [ ] question 14   
+- Andreas [X] question 15   
+-Otto [ ] question 16   
+- freddy [x] question 17   
+-Oscar [x] question 18   
+-Oscar [x] question 19   
+-Oscar [x] question 20   
+-Oscar [x] question 21   
+-Oscar [x] question 22   
+-Oscar [x] question 23   
+- freddy [x] question 24   
+- freddy [x] question 25   
+- freddy [x] question 26   
+- freddy [x] question 27   
+-Otto [ ] question 28   
+- [ ] question 29   
+- [ ] question 30   

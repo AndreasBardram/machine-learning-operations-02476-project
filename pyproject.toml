@@ -41,6 +41,7 @@ dependencies = [
     "onnxscript>=0.5.7",
     "netron>=8.8.3",
     "evidently>=0.7.20",
+    "prometheus-client>=0.24.1",
 ]
 
 [dependency-groups]
