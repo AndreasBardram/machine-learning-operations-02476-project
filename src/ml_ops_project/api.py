@@ -1,18 +1,20 @@
-import os
 import json
-
-import pandas as pd
-
-from pathlib import Path
-from datetime import datetime, timezone
+import os
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
 
+import anyio
+import pandas as pd
 import torch
+from datasets import load_dataset, load_from_disk
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from evidently import Report
+from evidently.presets import DataDriftPreset
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, model_validator
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -191,6 +193,26 @@ def create_predictor() -> Predictor:
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
     app.state.predictor = create_predictor()
+
+    # Load training data
+    # We prefer the processed subset that the model was likely trained on,
+    # but fallback to raw data if needed.
+    processed_path = Path("data/processed/transactiq_processed_text_subset_5000")
+    raw_path = Path("data/raw/transactiq_enriched_hf")
+
+    if processed_path.exists():
+        ds = load_from_disk(str(processed_path))
+    else:
+        if not raw_path.exists():
+            ds = load_dataset("sreesharvesh/transactiq-enriched")
+            ds.save_to_disk(str(raw_path))
+        ds = load_from_disk(str(raw_path))
+
+    if hasattr(ds, "keys") and "train" in ds:
+        app.state.training_data = ds["train"].to_pandas()
+    else:
+        app.state.training_data = ds.to_pandas()
+
     yield
 
 
@@ -209,7 +231,7 @@ def save_data_to_bucket(texts: list[str], predictions: list[dict], model_id: str
     if not bucket_name:
         raise ValueError("DATA_BUCKET_NAME environment variable is not set.")
 
-    timestamp = datetime.now(tz=timezone.utc)
+    timestamp = datetime.now(tz=UTC)
 
     data = {
         "timestamp": timestamp.isoformat(),
@@ -257,33 +279,47 @@ def predict(req: PredictRequest, background_tasks: BackgroundTasks) -> PredictRe
 
 
 def download_files(n: int = 5):
-    from google.cloud import storage
+    try:
+        from google.cloud import storage
+    except ImportError:
+        print("google-cloud-storage not installed or configured. Skipping download.")
+        return
 
-    # load current data from bucket
     bucket_name = os.getenv("DATA_BUCKET_NAME")
     if not bucket_name:
-        raise ValueError("DATA_BUCKET_NAME environment variable is not set.")
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+        print("DATA_BUCKET_NAME environment variable is not set. Skipping download.")
+        return
 
-    # data is stored in folder "predictions/" as prediction_{timestamp}.json
-    blobs = bucket.list_blobs(prefix="predictions/")
-    blobs.sort(key=lambda x: x.updated, reverse=True)
-    latest_blobs = blobs[:n]
+    try:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
 
-    for blob in latest_blobs:
-        blob.download_to_filename(blob.name)
+        # list_blobs returns an iterator, convert to list to sort
+        blobs = list(bucket.list_blobs(prefix="predictions/"))
+        blobs.sort(key=lambda x: x.updated, reverse=True)
+        latest_blobs = blobs[:n]
+
+        for blob in latest_blobs:
+            local_path = Path(blob.name)
+            local_path.parent.mkdir(parents=True, exist_ok=True)
+            blob.download_to_filename(str(local_path))
+    except Exception as e:
+        print(f"Failed to download files: {e}")
 
 
-def load_latest_files(directory: Path, n: int = 5):
+def load_latest_files(directory: Path, n: int = 5) -> pd.DataFrame:
     """
     Load latest n files from the from the directory
     """
     # download latest n files from the bucket
     download_files(n=n)
 
+    p = directory / "predictions"
+    if not p.exists():
+        return pd.DataFrame(columns=["transaction_description", "category"])
+
     # get all prediction files in the predictions/ folder
-    files = directory.glob("predictions/prediction_*.json")
+    files = list(p.glob("predictions_*.json"))
 
     # sort files by when they were created
     files = sorted(files, key=os.path.getmtime)
@@ -291,61 +327,48 @@ def load_latest_files(directory: Path, n: int = 5):
     # load latest n files
     latest_files = files[-n:]
 
-    data = {"texts": [], "target": []}
+    all_texts = []
+    all_preds = []
     for file in latest_files:
-        with open(file, "r") as f:
-            data = json.load(f)
-            data["texts"].extend(data.get("texts", []))
-            data["target"].extend(data.get("predictions", []))
-    df = pd.DataFrame(data)
-    return df
+        with open(file) as f:
+            content = json.load(f)
+            texts = content.get("texts", [])
+            preds = content.get("predictions", [])  # list of dicts
+
+            if len(texts) == len(preds):
+                all_texts.extend(texts)
+                # Extract 'label' from the prediction dictionary
+                all_preds.extend([pred.get("label") for pred in preds])
+
+    return pd.DataFrame({"transaction_description": all_texts, "category": all_preds})
 
 
-def generate_drift_report(reference_data: pd.DataFrame, prediction_data: pd.DataFrame) -> str:
-    from evidently import Dataset, DataDefinition
-    from evidently.presets import DataDriftPreset
-    from evidently.report import Report
+def generate_drift_report(reference_data: pd.DataFrame, current_data: pd.DataFrame) -> str:
+    # Ensure comparsion on common columns
+    common_cols = [c for c in reference_data.columns if c in current_data.columns]
 
-    data_definition = DataDefinition(
-        text_columns=["texts"],
-        categorical_columns=["target"],
-    )
+    report = Report(metrics=[DataDriftPreset()])
+    snapshot = report.run(reference_data=reference_data[common_cols], current_data=current_data[common_cols])
+    snapshot.save_html("data_drift_report.html")
 
-    reference_dataset = Dataset(data=reference_data, data_definition=data_definition)
-    prediction_dataset = Dataset(data=prediction_data, data_definition=data_definition)
 
-    preset = DataDriftPreset()
-    report = Report(metrics=[preset])
-    report.run(reference_data=reference_dataset, current_data=prediction_dataset)
-
-    # generate HTML report
-    html_report = report.as_html()
-    return html_report
-
-@app.get("/")
+@app.get("/report", response_class=HTMLResponse)
 async def data_drift_report():
     """
     Endpoint for data drift monitoring.
     """
-    from evidently import Dataset, DataDefinition
-    from evidently.presets import DataDriftPreset
-    from google.cloud import storage
+    training_data = getattr(app.state, "training_data", None)
+    if training_data is None:
+        return HTMLResponse("<h1>Training data not available</h1>", status_code=503)
 
-    # load reference data (training data)
-    reference_data = ""
+    prediction_data = load_latest_files(Path("."), n=5)
 
-    # load latest data from the bucket
-    prediction_data = load_latest_files(".", n=5)
+    if prediction_data.empty:
+        return HTMLResponse("<h1>No prediction data found</h1>", status_code=404)
 
+    generate_drift_report(training_data, prediction_data)
 
+    async with await anyio.open_file("data_drift_report.html", encoding="utf-8") as f:
+        html_content = await f.read()
 
-    
-
-
-
-
-    
-
-
-
-
+    return HTMLResponse(content=html_content, status_code=200)
