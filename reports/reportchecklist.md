@@ -28,5 +28,5 @@
 - freddy [x] question 26   
 - freddy [x] question 27   
 -Otto [ ] question 28   
-- [ ] question 29   
-- [ ] question 30   
+- Andreas [X] question 29   
+- [X] question 30   
