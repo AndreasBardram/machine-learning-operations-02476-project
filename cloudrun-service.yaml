@@ -18,6 +18,8 @@ spec:
           env:
             - name: DVC_PULL_ON_STARTUP
               value: "1"
+            - name: MODEL_CHECKPOINT_DIR
+              value: "models/checkpoints_transformer_subset"
           resources:
             limits:
               cpu: "1"
