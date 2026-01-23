@@ -461,7 +461,7 @@ Yes. We trained the transformer on Compute Engine using the `ml-ops-train` image
 >
 > Answer:
 
-Yes. The main FastAPI app (`src/ml_ops_project/api.py`) loads the newest checkpoint from `MODEL_CHECKPOINT_PATH`/`MODEL_CHECKPOINT_DIR` or falls back to a pretrained DistilBERT. It exposes `/health` and `/predict` supporting single text or batches and supports ENV overrides for labels/device/max_length. We also added an ONNX FastAPI (`onnx_fastapi.py`) that uses `onnxruntime` for CPU-efficient inference, plus a dummy predictor flag for integration tests. Both share a Pydantic schema and consistent error handling, and the Streamlit UI simply wraps the same endpoints with minimal glue. The API returns both label and probability so clients can threshold results, and errors return structured JSON with trace IDs for debugging downstream.
+Yes. The main FastAPI app (`src/ml_ops_project/api.py`) loads the newest checkpoint from `MODEL_CHECKPOINT_PATH`/`MODEL_CHECKPOINT_DIR` or falls back to a pretrained DistilBERT. It exposes `/health` and `/predict` supporting single text or batches and supports ENV overrides for labels/device/max_length. We also added an ONNX FastAPI (`onnx_fastapi.py`) that uses `onnxruntime` for CPU-efficient inference, plus a dummy predictor flag for integration tests. Both share a Pydantic schema and consistent error handling, and the Streamlit UI simply wraps the same endpoints with minimal glue. The API returns both label and probability so clients can threshold results, and errors return structured JSON with trace IDs for debugging downstream. Besides /predict and /health, we also expose /metrics for Prometheus scraping to support monitoring in Cloud Run.
 
 ### Question 24
 
