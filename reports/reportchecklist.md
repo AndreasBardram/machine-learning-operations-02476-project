@@ -1,32 +1,32 @@
 # Checklist for report questions: 
 
-- [ ] question 1  
-- [ ] question 2    
-- [ ] question 3   
-- [ ] question 4   
-- [ ] question 5   
-- [ ] question 6   
-- [ ] question 7   
-- [ ] question 8   
-- [ ] question 9   
-- [ ] question 10   
-- [ ] question 11   
-- [ ] question 12   
-- [ ] question 13   
-- [ ] question 14   
-- [ ] question 15   
-- [ ] question 16   
-- [ ] question 17   
-- [ ] question 18   
-- [ ] question 19   
-- [ ] question 20   
-- [ ] question 21   
-- [ ] question 22   
-- [ ] question 23   
-- [ ] question 24   
-- [ ] question 25   
-- [ ] question 26   
-- [ ] question 27   
-- [ ] question 28   
+- [x] question 1  
+- [x] question 2    
+-Oscar [x] question 3 - potentially recheck Otto
+-Oscar [x] question 4   
+- [x] question 5   
+-Oscar [x] question 6   
+- [x] question 7   
+- [x] question 8   
+- [x] question 9   
+-Oscar [x] question 10   
+-Andreas [X] question 11   
+-Otto [x] question 12   
+-Otto [x] question 13   
+-Otto [ ] question 14   
+- Andreas [X] question 15   
+-Otto [ ] question 16   
+- freddy [ ] question 17   
+-Oscar [x] question 18   
+-Oscar [x] question 19   
+-Oscar [x] question 20   
+-Oscar [x] question 21   
+-Oscar [x] question 22   
+-Oscar [x] question 23   
+- freddy [ ] question 24   
+- freddy [ ] question 25   
+- freddy [ ] question 26   
+- freddy [ ] question 27   
+-Otto [ ] question 28   
 - [ ] question 29   
 - [ ] question 30   

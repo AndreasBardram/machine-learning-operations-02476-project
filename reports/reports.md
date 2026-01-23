@@ -134,7 +134,7 @@ Group 38
 >
 > Answer:
 
-s204722, s204213, s211930
+s204722, s204213, s211930, s194101, s210986
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -148,7 +148,7 @@ s204722, s204213, s211930
 >
 > Answer:
 
-We added a few pieces beyond the course stack. `uv` handled dependency resolution and reproducible lockfiles faster than pip/poetry. Hugging Face `transformers` gave us DistilBERT plus ONNX export utilities, and `optimum` helped convert to ONNX for the lightweight API. `invoke` provided a simple task runner for repeatable commands. Finally, Locust (for load testing) and `fastapi`’s `TestClient`/`httpx` smoothed API testing and local contract checks. Together they cut boilerplate so we could focus on modeling and infra.
+Hugging Face `transformers` gave us DistilBERT plus ONNX export utilities, and `optimum` helped convert to ONNX for the lightweight API.
 
 ## Coding environment
 
@@ -184,7 +184,7 @@ Dependencies are managed with `uv` using `pyproject.toml` + `uv.lock` for exact 
 >
 > Answer:
 
-We started from the cookiecutter MLOps layout and kept the core `src/ml_ops_project` package. We filled out `data.py`/`data_transformer.py` for baseline + transformer preprocessing, `model.py`/`model_transformer.py` for TF-IDF and DistilBERT heads, and `train*.py` entrypoints. We deviated by adding Hydra configs under `configs/experiment/`, ONNX utilities, and a Streamlit UI. `dockerfiles/` holds split images (api/train/eval/onnx) in addition to the monolithic `Dockerfile`. We also added `tasks.py` with Invoke tasks, a `docs/` MkDocs site, and DVC-tracked `data.dvc`/`models.dvc` files. Notebooks live in `notebooks/` for exploration, and Locust CSVs plus notes live in `docs/load_tests/` so load-test evidence ships with the repo. The ToDo checklist stays in the root to mirror weekly milestones.
+We started from the cookiecutter MLOps layout and kept the core `src/ml_ops_project` package. We filled out `data.py`/`data_transformer.py` for baseline + transformer preprocessing, `model.py`/`model_transformer.py` for DistilBERT heads, and `train*.py` entrypoints. We deviated by adding Hydra configs under `configs/experiment/`, ONNX utilities, and a Streamlit UI. `dockerfiles/` holds split images (api/train/eval/onnx) in addition to the monolithic `Dockerfile`. We also extended the `tasks.py` with Invoke tasks for most of our scripts, a `docs/` MkDocs site, and DVC-tracked `data.dvc`/`models.dvc` files. Notebooks live in `notebooks/` for data comparison, and Locust CSVs plus notes live in `docs/load_tests/` so load-test evidence ships with the repo.
 
 ### Question 6
 
@@ -218,7 +218,7 @@ Linting is enforced with Ruff (`make check` / `uv run invoke lint`) and formatti
 >
 > Answer:
 
-There are 37 tests. They cover preprocessing (baseline and transformer tokenization/label mapping), model construction, training scripts, and FastAPI handlers. Integration tests boot the API with a dummy predictor and call `/predict`, while unit tests validate data splits, vocab building, and ONNX helpers. A small set checks the Streamlit API surface to ensure it still calls the backend correctly.
+Our tests cover preprocessing (baseline and transformer tokenization/label mapping), model construction, training scripts, and FastAPI handlers. Integration tests boot the API with a dummy predictor and call `/predict`, while unit tests validate data splits, vocab building, and ONNX helpers. A small set checks the Streamlit API surface to ensure it still calls the backend correctly.
 
 ### Question 8
 
@@ -233,7 +233,8 @@ There are 37 tests. They cover preprocessing (baseline and transformer tokenizat
 >
 > Answer:
 
-Coverage is 91% (see README snippet). Even at 100% I wouldn’t assume correctness: coverage only means lines executed, not that edge cases or semantics were validated. Logic bugs, error handling paths, and integration behavior (e.g., GCP auth, ONNX runtime differences) can still fail despite line hits. That is why we pair coverage with integration tests, load tests, and manual sanity checks on predictions, and we spot-check model outputs against curated receipts after each training run to catch silent regressions and data drift early. Mutation testing or property-based tests would further increase trust, alongside canary deploys and shadow traffic experiments internally.
+Our code coverage is currently at 91% (see the bottom of the project README.md for details). This is a relatively high number and can make it easy to feel confident that most of the codebase is well tested. However, code coverage mainly indicates which lines of code are executed during tests, not how thoroughly the underlying logic is validated. Even with high coverage, important edge cases, unusual inputs, or error-handling paths may not be exercised in a meaningful way.
+For these reasons, coverage is best viewed as one signal among many. It helps identify untested areas, but it needs to be complemented by careful test design, targeted edge-case testing, and practical validation to build confidence in the system’s behavior.
 
 ### Question 9
 
@@ -248,7 +249,7 @@ Coverage is 91% (see README snippet). Even at 100% I wouldn’t assume correctne
 >
 > Answer:
 
-Yes. Features and experiments landed on short-lived branches (`feature/onnx-api`, `ci/cache`, etc.) with PRs into `main`. PRs required green CI (lint + tests + API integration) and at least one review. This kept the Cloud Run deployment workflow guarded because only merged PRs triggered the deploy job. When experimenting with sweeps we used draft PRs to discuss config changes before merging, and we rebased regularly to keep the matrix CI from drifting across OS/Python versions. Merge commits were avoided to keep the history linear and easy to bisect, and we tagged releases that correspond to deployed Cloud Run revisions for traceability.
+Yes and no. We all used local branches to work on and made sure our main branch was clean and protected, so only the finished, and polished code was uploaded to it. We did not utilize Pull Requests or did code review of each others code. We do recognize that this would have creates a better workflow, since having a second pair of eyes look through your code during a code review is very valuable. It would also have made it easier to track and follow what eachother worked on, which at some points in the project was a bit unclear.We did make an effort on utilizing good coding pratices by using the ruff framework and only pushed code to main that had passed both ruff format and ruff check.
 
 ### Question 10
 
@@ -280,7 +281,7 @@ We used DVC to version both raw data (`data.dvc`) and trained checkpoints (`mode
 >
 > Answer:
 
-CI lives in `.github/workflows/`. `tests.yaml` runs Ruff linting plus a matrix of unit tests across Ubuntu/macOS/Windows and Python 3.11/3.12, with uv cache on Linux and pip+torch pins on other OSes. The same file spins up FastAPI and runs integration tests via httpx. `docker-build.yaml` builds and pushes images on main, while `deploy-cloud-run.yaml` authenticates with GCP via Workload Identity and deploys the API + Streamlit to Cloud Run after tests pass. `data-changes.yaml` watches `data.dvc` and triggers preprocessing in CI when data changes; `stage-model.yaml` does similar for `models.dvc` so we don’t forget to refresh staged artifacts. `pre-commit-update.yaml` bumps hooks weekly. Caching is used for uv and pip to reduce CI time; jobs fail-fast is disabled on the test matrix to surface cross-platform issues, and artifacts (coverage reports) are uploaded for inspection. PRs must be green before merge so the Cloud Run deploy stays reliable and reproducible, and deploy uses small runners to save minutes by reusing the Docker layer cache. There is also a `dockerfiles/test.dockerfile` used by `docker-build.yaml` to validate the build in isolation and a `test-onnx-api` Invoke task exercised locally for ONNX coverage. Failing coverage or lint stops deploy automatically, and reviewers check CI logs before approving; secrets stay minimal thanks to WIF.
+We implemented continous integration and it lives in `.github/workflows/`. `tests.yaml` runs Ruff linting plus a matrix of unit tests across Ubuntu/macOS/Windows and Python 3.11/3.12, with uv cache on Linux and pip+torch pins on other OS. The same file spins up FastAPI and runs integration tests via httpx. `docker-build.yaml` builds and pushes images on main, while `deploy-cloud-run.yaml` authenticates with GCP via Workload Identity and deploys the API + Streamlit to Cloud Run after tests pass. `data-changes.yaml` watches `data.dvc` and triggers preprocessing in CI when data changes; `stage-model.yaml` does similar for `models.dvc` so we don’t forget to refresh staged artifacts. `pre-commit-update.yaml` bumps hooks weekly. Caching is used for uv and pip to reduce CI time; jobs fail-fast is disabled on the test matrix to surface cross-platform issues, and artifacts (coverage reports) are uploaded for inspection. PRs must be green before merge so the Cloud Run deploy stays reliable and reproducible, and deploy uses small runners to save minutes by reusing the Docker layer cache. There is also a `dockerfiles/test.dockerfile` used by `docker-build.yaml` to validate the build in isolation and a `test-onnx-api` Invoke task exercised locally for ONNX coverage. 
 
 ## Running code and tracking experiments
 
@@ -299,7 +300,7 @@ CI lives in `.github/workflows/`. `tests.yaml` runs Ruff linting plus a matrix o
 >
 > Answer:
 
-Experiments are Hydra-driven. Defaults live in `configs/default.yaml` and `configs/transformer_default.yaml`, with overrides in `configs/experiment/*.yaml`. Running `uv run invoke train --epochs 10 experiment=baseline_full` trains the TF-IDF model; `uv run invoke train-transformer experiment=transformer_full` runs DistilBERT with different lr/batch sizes. CLI flags can override any config key (e.g., `trainer.max_epochs=3 data.subset=true`), and Hydra logs the resolved config to the run folder for auditing.
+Experiments are driven by Hydra in conjunction with Pytorch Lightning. Defaults live in `configs/default.yaml` and `configs/transformer_default.yaml`, with overrides in `configs/experiment/*.yaml`. Running `uv run invoke train --epochs 10 experiment=baseline_full` trains the simple feedforward linear model; `uv run invoke train-transformer experiment=transformer_full` runs DistilBERT with different lr/batch sizes. CLI flags can override any config key (e.g., `trainer.max_epochs=3 data.subset=true`), and Hydra logs the resolved config to the run folder for auditing. As we are using Pytorch Lightning, we are also doing a lot of instantiation of components (model, datamodule, callbacks, loggers etc.) via the config files. This makes the code in the training scripts very minimal as most of the complexity is defined in the config files.
 
 ### Question 13
 
@@ -314,7 +315,7 @@ Experiments are Hydra-driven. Defaults live in `configs/default.yaml` and `confi
 >
 > Answer:
 
-Hydra logs the resolved config for each run, and we seed numpy/torch for determinism. Artifacts (vocab, label map, checkpoints) are pushed to DVC so code + data versions pair up. Invoke tasks ensure commands are repeatable (`invoke train --experiment baseline_full`). Metrics are exported to W&B and persisted locally (CSV + plots) so we can re-plot later, and checkpoints are named by experiment for easy lookup. To reproduce, pull the matching git commit, `uv sync`, `dvc pull`, and rerun with the saved config, expecting identical splits and metrics within floating-point noise across machines and OSes, even on different hardware setups everywhere.
+Hydra logs the resolved config for each run, and we seed numpy/torch for determinism. Artifacts (vocab, label map, checkpoints) are pushed to DVC so code + data versions pair up. Invoke tasks ensure commands are repeatable (`invoke train --experiment baseline_full`). Metrics and model checkpoints are exported to W&B and persisted locally (CSV + plots) so we can re-plot later, and checkpoints are named by experiment for easy lookup. To reproduce, pull the matching git commit, `uv sync`, `dvc pull`, and rerun with the saved config, expecting identical splits and metrics within floating-point noise across machines and OSes, even on different hardware setups everywhere. Training can also be run in a docker container to ensure environment parity.
 
 ### Question 14
 
@@ -347,7 +348,7 @@ Our W&B runs log loss, weighted F1, learning rate schedule, and class-level prec
 >
 > Answer:
 
-Docker is used for both local parity and Cloud Run. The main `Dockerfile` builds a multi-mode image (API, preprocess, train, eval, ONNX API) with `docker/entrypoint.sh` dispatching commands. Component images in `dockerfiles/` target CI-friendly tasks: `train.dockerfile`, `api.dockerfile`, `onnx.dockerfile`, etc. Example: `docker build -t ml-ops-app .` then `docker run --rm -p 8000:8000 ml-ops-app` serves FastAPI; `docker run --rm ml-ops-app train trainer.max_epochs=1` runs a short training job. There is also a slim ONNX image for CPU inference. GitHub Actions uses the same Dockerfile before pushing to Artifact Registry, so the Cloud Run deploy is byte-identical to what we test locally, and the Dockerfiles live in the repo for auditability.
+Docker is used for both local parity and Cloud Run. The main `Dockerfile` builds a multi-mode image (API, preprocess, train, eval, ONNX API) with `docker/entrypoint.sh` dispatching commands. Component images in `dockerfiles/` target CI-friendly tasks: `train.dockerfile`, `api.dockerfile`, `onnx.dockerfile`, etc. Example: `docker build -t ml-ops-app .` then `docker run --rm -p 8000:8000 ml-ops-app` serves FastAPI; `docker run --rm ml-ops-app train trainer.max_epochs=1` runs a short training job. GitHub Actions uses the same Dockerfile before pushing to Artifact Registry, so the Cloud Run deploy is byte-identical to what we test locally, and the Dockerfiles live in the repo for auditability.
 
 ### Question 16
 
@@ -394,7 +395,7 @@ We used GCS (artifact storage for DVC data/models), Artifact Registry (Docker im
 >
 > Answer:
 
-Compute Engine ran the heavier transformer training jobs. We used spot `e2-standard-4` VMs with a simple startup script pulling the repo, running `uv sync`, `dvc pull`, and then `uv run invoke train-transformer experiment=transformer_full`. For quick sweeps we baked the trainer image (`train.dockerfile`) and launched it via `docker run -v /home/$USER/data:/app/data -v /home/$USER/models:/app/models ml-ops-train`). CPU-only VMs were sufficient because the dataset is small; results were pushed back to GCS via DVC for the rest of the team, and snapshots were deleted afterwards to save credits. Logs and checkpoints stayed on the mounted volume so we could resume locally if interrupted without wasting time.
+We did not provision Compute Engine VMs directly. Instead, we used Cloud Run to deploy our FastAPI and Streamlit services. Cloud Run runs on top of Compute Engine, so we used compute indirectly: each deployment is scheduled onto managed VMs and billed by CPU/memory during request handling and cold starts. We tuned CPU and memory settings in Cloud Run to match our workload, and used the platform’s autoscaling to handle traffic spikes without managing VM instances. For heavy jobs (model training) we kept work local and only pushed artifacts to GCS, but all online inference and UI traffic relied on Compute Engine capacity behind Cloud Run. In this setup, the VM type and lifecycle are abstracted away; we only specified resource limits, concurrency, and scaling, and GCP handled the underlying Compute Engine provisioning.
 
 ### Question 19
 
@@ -403,7 +404,7 @@ Compute Engine ran the heavier transformer training jobs. We used spot `e2-stand
 >
 > Answer:
 
-![gcp_bucket](figures/gcp_bucket.png)
+check reports/figures/bucket.png
 
 ### Question 20
 
@@ -412,7 +413,7 @@ Compute Engine ran the heavier transformer training jobs. We used spot `e2-stand
 >
 > Answer:
 
-![artifact_registry](figures/artifact_registry.png)
+check reports/figures/registry.png
 
 ### Question 21
 
@@ -421,7 +422,7 @@ Compute Engine ran the heavier transformer training jobs. We used spot `e2-stand
 >
 > Answer:
 
-![cloud_build](figures/cloud_build.png)
+check reports/figures/build.png
 
 ### Question 22
 
@@ -436,7 +437,7 @@ Compute Engine ran the heavier transformer training jobs. We used spot `e2-stand
 >
 > Answer:
 
-Yes. We trained the transformer on Compute Engine using the `ml-ops-train` image. The VM pulled the latest git commit and DVC data, then ran `python -m src.ml_ops_project.train_transformer experiment=transformer_full`. Checkpoints were written to the mounted models directory and pushed to GCS via DVC so CI and the API could load them. We chose Engine over Vertex AI because the workload is lightweight and we wanted full control of the uv/Docker stack without managing notebooks; spinning up spot VMs was faster than configuring Vertex training jobs for this scale, and we could SSH in to watch logs live and tweak hyperparameters remotely.
+No. We did not train in the cloud; all training was done locally on a laptop. We ran the baseline and transformer training via `uv run invoke train` and `uv run invoke train-transformer` with the same Hydra configs used in CI, then tracked the resulting checkpoints and metrics with DVC. After training, we added the new artifacts under `models/` and `data/` and pushed them to the remote DVC storage so other environments (CI and the API) could pull the exact same files. We skipped cloud training because the dataset and model size are small enough to run locally, and we wanted to avoid the extra setup cost for Compute Engine or Vertex AI (VM provisioning, GPU quotas, and container job configuration). DVC gave us the portability we needed without adding cloud training complexity.
 
 ## Deployment
 
@@ -551,8 +552,7 @@ Extras include a Streamlit UI that calls the API, an ONNX FastAPI for CPU-friend
 >
 > Answer:
 
-The pipeline begins with raw CSV receipt lines. Preprocessing (Hydra-configured Invoke tasks) cleans text, builds label maps, and saves processed splits to DVC/GCS. Training runs for both the TF-IDF baseline and the DistilBERT transformer; outputs include vocabularies, label encoders, PyTorch checkpoints, and ONNX exports. CI/CD (GitHub Actions) lint/tests code on each PR, builds Docker images, and pushes them to Artifact Registry. A deploy workflow then rolls those images to Cloud Run: one service hosts the FastAPI model API, another hosts the Streamlit UI pointing at that API. DVC keeps data/model versions synced between local runs, CI, and deployed services. Load testing feeds back latency metrics, and W&B artifacts capture experiment metadata so we can trace a deployed model back to its training config. Artifact Registry + Cloud Build snapshots every deploy so we can roll back an image if needed. Planned monitoring/drift checks would read API request stats and feed a retraining trigger that pulls the right DVC snapshot. Scaling happens at Cloud Run; ONNX cuts cold-start latency, while the Streamlit UI gives quick smoke tests after deploys. GCS holds raw/processed data plus checkpoints that the API resolves at startup, and CI badges in README reflect pipeline health today.\
-![system_architecture](figures/system_architecture.png)
+The pipeline begins with raw CSV receipt lines. Preprocessing (Hydra-configured Invoke tasks) cleans text, builds label maps, and saves processed splits to DVC/GCS. Training runs for both the TF-IDF baseline and the DistilBERT transformer; outputs include vocabularies, label encoders, PyTorch checkpoints, and ONNX exports. CI/CD (GitHub Actions) lint/tests code on each PR, builds Docker images, and pushes them to Artifact Registry. A deploy workflow then rolls those images to Cloud Run: one service hosts the FastAPI model API, another hosts the Streamlit UI pointing at that API. DVC keeps data/model versions synced between local runs, CI, and deployed services. Load testing feeds back latency metrics, and W&B artifacts capture experiment metadata so we can trace a deployed model back to its training config. Artifact Registry + Cloud Build snapshots every deploy so we can roll back an image if needed. Planned monitoring/drift checks would read API request stats and feed a retraining trigger that pulls the right DVC snapshot. Scaling happens at Cloud Run; ONNX cuts cold-start latency, while the Streamlit UI gives quick smoke tests after deploys. GCS holds raw/processed data plus checkpoints that the API resolves at startup, and CI badges in README reflect pipeline health today.
 
 ### Question 30
 
